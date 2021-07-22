@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
                 val view = findViewById<View>(android.R.id.content)
                 Snackbar.make(view, getString(R.string.create_account_failure_message), Snackbar.LENGTH_LONG).show()
 
-                //Log.w("kotlintest", "createUserWithEmail:failure", task.getException())
+                Log.w("kotlintest", "createUserWithEmail:failure", task.getException())
 
                 // プログレスバーを非表示にする
                 progressBar.visibility = View.GONE
