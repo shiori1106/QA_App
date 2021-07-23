@@ -1,14 +1,13 @@
 package jp.techacademy.shiori.tazawa.qa_app
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.util.Base64
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_question_detail.*
-import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.listView
 
 class QuestionDetailActivity : AppCompatActivity() {
@@ -16,15 +15,11 @@ class QuestionDetailActivity : AppCompatActivity() {
     private lateinit var mQuestion: Question
     private lateinit var mAdapter: QuestionDetailListAdapter
     private lateinit var mAnswerRef: DatabaseReference
+
     // 追加
     private lateinit var mFavorite: ArrayList<Favorite>
-    private lateinit var userRef: DatabaseReference
     private lateinit var favoriteQuestionRef: DatabaseReference
-    private lateinit var mDataBaseReference: DatabaseReference
-    private lateinit var mFavoriteAdapter: FavoriteAdapter
-    private lateinit var mFavoriteArrayList: ArrayList<Favorite>
 
-    private lateinit var mFavoriteList: MutableList<String>
     private var isFavorite = false
     val user = FirebaseAuth.getInstance().currentUser
 
@@ -76,44 +71,6 @@ class QuestionDetailActivity : AppCompatActivity() {
         }
 
     }
-/*
-    private val favoriteEventListener = object:ChildEventListener{
-
-        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
-
-            val map = dataSnapshot.value as Map<String, String>
-            val questionUid = dataSnapshot.key ?: ""
-
-            /*
-            if (questionUid == mQuestion.questionUid){
-                isFavorite = true
-            }*/
-
-            Log.d("kotlintest",isFavorite.toString())
-
-            /*
-            mFavoriteList.add(questionUid)
-            Log.d("kotlin_test",mFavoriteList.toString())
-*/
-
-        }
-
-        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onChildRemoved(snapshot: DataSnapshot) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-            TODO("Not yet implemented")
-        }
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,7 +103,6 @@ class QuestionDetailActivity : AppCompatActivity() {
         mAdapter.notifyDataSetChanged()
 
         // お気に入りリストの準備
-        /*mFavoriteList = mutableListOf()*/
 
         fab.setOnClickListener {
             // ログイン済みのユーザーを取得する
@@ -168,11 +124,6 @@ class QuestionDetailActivity : AppCompatActivity() {
             AnswersPATH)
         mAnswerRef.addChildEventListener(mEventListener)
 
-        /*// お気に入りリスト用
-        userRef = databaseReference.child(FavoritePATH).child(user!!.uid)
-        userRef.addChildEventListener(favoriteEventListener)
-*/
-
 
         // ハートボタンが押されたとき、ログイン情報を確認する
 
@@ -181,14 +132,12 @@ class QuestionDetailActivity : AppCompatActivity() {
             if (user == null){
                 // ログインしていない場合はログイン画面に遷移させる
 
-                // Snackbar.make(v, getString(R.string.no_login_user), Snackbar.LENGTH_LONG).show() // メッセージだけ表示させるときの処理
                 val intent = Intent(applicationContext, LoginActivity::class.java)
                 startActivity(intent)
 
             } else {
 
                 // お気に入りに登録されているときは、お気に入りから削除してハートの色を変える
-
                 favoriteQuestionRef = databaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
 
                 if (isFavorite) {
@@ -196,6 +145,9 @@ class QuestionDetailActivity : AppCompatActivity() {
                 // お気に入りに登録されている場合
 
                     isFavorite = false
+
+                    // メッセージを表示
+                    Snackbar.make(v, getString(R.string.favorite_delete), Snackbar.LENGTH_LONG).show()
 
                     // firebase上のお気に入りから削除
                     favoriteQuestionRef.removeValue()
@@ -212,16 +164,21 @@ class QuestionDetailActivity : AppCompatActivity() {
 
                     isFavorite = true
 
+                    // メッセージを表示
+                    Snackbar.make(v, getString(R.string.favorite_add), Snackbar.LENGTH_LONG).show()
+
                     // firebase上のお気に入りに登録
                     val data = HashMap<String, String>()
 
                     data["body"] = mQuestion.body
-                    data["image"] = mQuestion.imageBytes.toString() // 要検討
+                    val imageBytes = mQuestion.imageBytes
+                    if (imageBytes.isNotEmpty()){
+                        data["image"] = Base64.encodeToString(imageBytes,Base64.DEFAULT)
+                    }
                     data["name"] = mQuestion.name
                     data["title"] = mQuestion.title
                     data["uid"] = mQuestion.questionUid
                     data["genre"] = mQuestion.genre.toString()
-                    // 回答数も？
 
                     favoriteQuestionRef.setValue(data)
 

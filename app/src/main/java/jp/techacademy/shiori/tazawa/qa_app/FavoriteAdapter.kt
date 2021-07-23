@@ -1,10 +1,13 @@
 package jp.techacademy.shiori.tazawa.qa_app
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.list_favorite.view.*
 
@@ -46,23 +49,27 @@ class FavoriteAdapter(context: Context): BaseAdapter() {
         val nameText = convertView.nameTextView as TextView
         nameText.text = mFavoriteArrayList[position].name
 
-        val resText = convertView.resTextView as TextView
-        // val resNum
+        val bytes = mFavoriteArrayList[position].imageBytes
+        if (bytes.isNotEmpty()){
+            val image = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).copy(Bitmap.Config.ARGB_8888, true)
+            val imageView = convertView.imageView as ImageView
+            imageView.setImageBitmap(image)
+        }
 
         val genreText = convertView.genreTextView as TextView
 
         var genreName = "ジャンル"
         when (mFavoriteArrayList[position].genre){
-            "1" -> {
+            1 -> {
                 genreName = "趣味"
             }
-            "2" -> {
+            2 -> {
                 genreName = "生活"
             }
-            "3" -> {
+            3 -> {
                 genreName = "健康"
             }
-            "4" -> {
+            4 -> {
                 genreName = "コンピュータ"
             }
         }

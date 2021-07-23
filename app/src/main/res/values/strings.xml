@@ -51,10 +51,16 @@
     <string name="get_image">画像を取得</string>
     <string name="question_send_error_message">投稿に失敗しました</string>
     <string name="question_no_select_genre">ジャンルを選択してください</string>
+    <string name="question_favorite_select_genre">お気に入り画面からは投稿できません</string>
 
     <!-- 回答投稿画面用文字列 -->
     <string name="answer_text_label">回答</string>
     <string name="post_button_label">投稿</string>
     <string name="send_answer_failure">投稿に失敗しました</string>
     <string name="answer_error_message">回答を入力してください</string>
+
+    <!-- お気に入りに用文字列 -->
+    <string name="favorite_add">お気に入りに追加しました</string>
+    <string name="favorite_delete">お気に入りから削除しました</string>
+
 </resources>
